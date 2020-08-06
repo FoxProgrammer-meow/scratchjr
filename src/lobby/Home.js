@@ -3,13 +3,12 @@
 //////////////////////////////////////////////////
 
 import Lobby from './Lobby';
-import iOS from '../iPad/iOS';
-import IO from '../iPad/IO';
+import IO from '../tablet/IO';
 import Project from '../editor/ui/Project';
 import Localization from '../utils/Localization';
 import ScratchAudio from '../utils/ScratchAudio';
 import Vector from '../geom/Vector';
-import {gn, newHTML, isTablet} from '../utils/lib';
+import {gn, newHTML, isTablet, OS} from '../utils/lib';
 
 let frame;
 let scrollvalue;
@@ -135,7 +134,7 @@ export default class Home {
             if (md5 && (md5 == 'newproject')) {
                 Home.createNewProject();
             } else if (md5) {
-                iOS.setfile('homescroll.sjr', gn('wrapc').scrollTop, function () {
+                window[OS].setfile('homescroll.sjr', gn('wrapc').scrollTop, function () {
                     doNext(md5);
                 });
             }
@@ -144,10 +143,10 @@ export default class Home {
             ScratchAudio.sndFX('cut.wav');
             Project.thumbnailUnique(Home.actionTarget.thumb, Home.actionTarget.id, function (isUnique) {
                 if (isUnique) {
-                    iOS.remove(Home.actionTarget.thumb, iOS.trace);
+                    window[OS].remove(Home.actionTarget.thumb, window[OS].trace);
                 }
             });
-            iOS.setfield(iOS.database, Home.actionTarget.id, 'deleted', 'YES', Home.removeProjThumb);
+            window[OS].setfield(window[OS].database, Home.actionTarget.id, 'deleted', 'YES', Home.removeProjThumb);
             break;
         default:
             if (Home.actionTarget && (Home.actionTarget.childElementCount > 2)) {
@@ -156,13 +155,13 @@ export default class Home {
             break;
         }
         function doNext () {
-            iOS.analyticsEvent('lobby', 'existing_project_edited');
+            window[OS].analyticsEvent('lobby', 'existing_project_edited');
             window.location.href = 'editor.html?pmd5=' + md5 + '&mode=edit';
         }
     }
 
     static createNewProject () {
-        iOS.analyticsEvent('lobby', 'project_created');
+        window[OS].analyticsEvent('lobby', 'project_created');
         var obj = {};
         // XXX: for localization, the new project name should likely be refactored
         obj.name = Home.getNextName(Localization.localize('NEW_PROJECT_PREFIX'));
@@ -172,7 +171,7 @@ export default class Home {
     }
 
     static gotoEditor (md5) {
-        iOS.setfile('homescroll.sjr', gn('wrapc').scrollTop, function () {
+        window[OS].setfile('homescroll.sjr', gn('wrapc').scrollTop, function () {
             doNext(md5);
         });
         function doNext (md5) {
@@ -230,7 +229,7 @@ export default class Home {
     //////////////////////////
 
     static displayYourProjects () {
-        iOS.getfile('homescroll.sjr', gotScrollsState);
+        window[OS].getfile('homescroll.sjr', gotScrollsState);
         function gotScrollsState (str) {
             var num = Number(atob(str));
             scrollvalue = (num.toString() == 'NaN') ? 0 : num;
@@ -239,7 +238,7 @@ export default class Home {
             json.items = ['name', 'thumbnail', 'id', 'isgift'];
             json.values = ['NO', version];
             json.order = 'ctime desc';
-            IO.query(iOS.database, json, Home.displayProjects);
+            IO.query(window[OS].database, json, Home.displayProjects);
         }
     }
 

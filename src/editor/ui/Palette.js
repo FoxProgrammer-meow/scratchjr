@@ -7,8 +7,7 @@ import Block from '../blocks/Block';
 import BlockSpecs from '../blocks/BlockSpecs';
 import ScriptsPane from './ScriptsPane';
 import Undo from './Undo';
-import iOS from '../../iPad/iOS';
-import MediaLib from '../../iPad/MediaLib';
+import MediaLib from '../../tablet/MediaLib';
 import Events from '../../utils/Events';
 import Rectangle from '../../geom/Rectangle';
 import DrawPath from '../../utils/DrawPath';
@@ -16,7 +15,7 @@ import ScratchAudio from '../../utils/ScratchAudio';
 import Record from './Record';
 import {frame, gn, localx, newHTML, scaleMultiplier, isTablet, newDiv,
     setProps, globalx, localy, globaly, drawScaled, newCanvas,
-    setCanvasSize, hitRect, writeText, getStringSize} from '../../utils/lib';
+    setCanvasSize, hitRect, writeText, getStringSize, OS} from '../../utils/lib';
 
 
 let blockscale = 0.75;
@@ -582,7 +581,7 @@ export default class Palette {
         e.preventDefault();
         switch (Palette.getLandingPlace(element, e)) {
         case 'scripts':
-            iOS.analyticsEvent('editor', 'new_block_' + element.owner.blocktype);
+            window[OS].analyticsEvent('editor', 'new_block_' + element.owner.blocktype);
             var sc = ScratchJr.getActiveScript();
             var dx = localx(sc, element.left);
             var dy = localy(sc, element.top);

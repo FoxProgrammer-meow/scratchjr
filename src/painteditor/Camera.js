@@ -1,5 +1,4 @@
 import ScratchJr from '../editor/ScratchJr';
-import iOS from '../iPad/iOS';
 import ScratchAudio from '../utils/ScratchAudio';
 import Paint from './Paint';
 import PaintUndo from './PaintUndo';
@@ -9,7 +8,7 @@ import SVG2Canvas from '../utils/SVG2Canvas';
 import Rectangle from '../geom/Rectangle';
 import Layer from './Layer';
 import Ghost from './Ghost';
-import {gn, globalx, globaly, DEGTOR, setCanvasSize, isAndroid} from '../utils/lib';
+import {gn, globalx, globaly, DEGTOR, setCanvasSize, isAndroid, OS} from '../utils/lib';
 
 let view = 'front';
 let target = undefined;
@@ -53,7 +52,7 @@ export default class Camera {
         data.mw = Paint.workspaceWidth;
         data.mh = Paint.workspaceHeight;
         data.image = mask.toDataURL('image/png');
-        iOS.startfeed(data, iOS.trace);
+        window[OS].startfeed(data, window[OS].trace);
         Paint.cameraToolsOn();
     }
 
@@ -80,7 +79,7 @@ export default class Camera {
         case 'cameraflip':
             ScratchAudio.sndFX('tap.wav');
             view = (view == 'front') ? 'back' : 'front';
-            iOS.choosecamera(view, Camera.flip);
+            window[OS].choosecamera(view, Camera.flip);
             break;
         case 'camerasnap':
             Camera.snapShot();
@@ -101,7 +100,7 @@ export default class Camera {
         target = undefined;
         view = 'front';
         Camera.active = false;
-        iOS.stopfeed();
+        window[OS].stopfeed();
         Paint.cameraToolsOff();
         if (isAndroid) {
             ScratchJr.onBackButtonCallback.pop();
@@ -109,7 +108,7 @@ export default class Camera {
     }
 
     static snapShot () {
-        iOS.captureimage('Camera.processimage'); // javascript call back;
+        window[OS].captureimage('Camera.processimage'); // javascript call back;
     }
 
     static getLayerMask (elem) {
@@ -197,5 +196,5 @@ export default class Camera {
     }
 }
 
-// Exposing the camera for the tablet callback in iOS.snapShot
+// Exposing the camera for the tablet callback in window[OS].snapShot
 window.Camera = Camera;

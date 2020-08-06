@@ -12,9 +12,8 @@ import Project from '../ui/Project';
 import Thumbs from '../ui/Thumbs';
 import UI from '../ui/UI';
 import BlockSpecs from '../blocks/BlockSpecs';
-import iOS from '../../iPad/iOS';
-import IO from '../../iPad/IO';
-import MediaLib from '../../iPad/MediaLib';
+import IO from '../../tablet/IO';
+import MediaLib from '../../tablet/MediaLib';
 import Undo from '../ui/Undo';
 import ScriptsPane from '../ui/ScriptsPane';
 import SVG2Canvas from '../../utils/SVG2Canvas';
@@ -28,7 +27,7 @@ import {newHTML, newDiv, newP, gn,
     setCanvasSizeScaledToWindowDocumentHeight,
     DEGTOR, getIdFor, setProps, isTablet, isiOS,
     isAndroid, fitInRect, scaleMultiplier, setCanvasSize,
-    globaly, globalx, rgbToHex} from '../../utils/lib';
+    globaly, globalx, rgbToHex, OS} from '../../utils/lib';
 
 export default class Sprite {
     constructor (attr, whenDone) {
@@ -77,12 +76,14 @@ export default class Sprite {
     getAsset (whenDone) {
         var md5 = this.md5;
         var spr = this;
-        var url = (MediaLib.keys[md5]) ? MediaLib.path + md5 : (md5.indexOf('/') < 0) ? iOS.path + md5 : md5;
+        var url = (MediaLib.keys[md5]) ?
+            MediaLib.path + md5 :
+            (md5.indexOf('/') < 0) ? window[OS].path + md5 : md5;
         md5 = (MediaLib.keys[md5]) ? MediaLib.path + md5 : md5;
         if (md5.indexOf('/') > -1) {
             IO.requestFromServer(md5, doNext);
         } else {
-            iOS.getmedia(md5, nextStep);
+            window[OS].getmedia(md5, nextStep);
         }
         function nextStep (base64) {
             doNext(atob(base64));
@@ -90,7 +91,7 @@ export default class Sprite {
         function doNext (str) {
             str = str.replace(/>\s*</g, '><');
             spr.setSVG(str);
-            if ((str.indexOf('xlink:href') < 0) && iOS.path) {
+            if ((str.indexOf('xlink:href') < 0) && window[OS].path) {
                 whenDone(url); // does not have embedded images
             } else {
                 var base64 = IO.getImageDataURL(spr.md5, btoa(str));
@@ -716,7 +717,7 @@ export default class Sprite {
         var sprites = JSON.parse(page.sprites);
         sprites.push(this.id);
         page.sprites = JSON.stringify(sprites);
-        iOS.analyticsEvent('editor', 'text_sprite_create');
+        window[OS].analyticsEvent('editor', 'text_sprite_create');
         if ((this.str == '') && !whenDone) {
             this.setTextBox();
             this.activateInput();
@@ -806,7 +807,7 @@ export default class Sprite {
         document.body.scrollLeft = 0;
         var form = document.forms.activetextbox;
         var changed = (this.oldvalue != form.typing.value);
-        iOS.analyticsEvent('editor', 'text_sprite_close');
+        window[OS].analyticsEvent('editor', 'text_sprite_close');
         if (this.noChars(form.typing.value)) {
             this.deleteText(this.oldvalue != '');
         } else {
@@ -891,7 +892,7 @@ export default class Sprite {
         var ti = document.forms.activetextbox.typing;
         gn('textbox').style.visibility = 'visible';
         var me = this;
-        iOS.analyticsEvent('editor', 'text_sprite_open');
+        window[OS].analyticsEvent('editor', 'text_sprite_open');
         ti.onblur = function () {
             me.unfocusText();
         };

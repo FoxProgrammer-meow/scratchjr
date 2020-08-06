@@ -6,8 +6,7 @@ import Undo from './ui/Undo';
 import Alert from './ui/Alert';
 import Palette from './ui/Palette';
 import Record from './ui/Record';
-import IO from '../iPad/IO';
-import iOS from '../iPad/iOS';
+import IO from '../tablet/IO';
 import UI from './ui/UI';
 import Menu from './blocks/Menu';
 import Library from './ui/Library';
@@ -18,7 +17,7 @@ import BlockSpecs from './blocks/BlockSpecs';
 import Runtime from './engine/Runtime';
 import Localization from '../utils/Localization';
 import {libInit, gn, scaleMultiplier, newHTML,
-    isAndroid, isTablet, getUrlVars, CSSTransition3D, frame} from '../utils/lib';
+    isAndroid, isTablet, getUrlVars, CSSTransition3D, frame, OS} from '../utils/lib';
 
 let workingCanvas = document.createElement('canvas');
 let workingCanvas2 = document.createElement('canvas');
@@ -183,7 +182,7 @@ export default class ScratchJr {
         document.body.scrollTop = 0;
         time = (new Date()) - 0;
         var urlvars = getUrlVars();
-        iOS.hascamera();
+        window[OS].hascamera();
         ScratchJr.log('starting the app');
         BlockSpecs.initBlocks();
         Project.loadIcon = document.createElement('img');
@@ -345,7 +344,7 @@ export default class ScratchJr {
 
     static saveProject (e, onDone) {
         if (ScratchJr.isEditable() && editmode == 'storyStarter' && storyStarted && !Project.error) {
-            iOS.analyticsEvent('samples', 'story_starter_edited', Project.metadata.name);
+            window[OS].analyticsEvent('samples', 'story_starter_edited', Project.metadata.name);
             // Localize sample project names
             var sampleName = Localization.localize('SAMPLE_' + Project.metadata.name);
             // Get the new project name
@@ -381,14 +380,14 @@ export default class ScratchJr {
         ScratchJr.stopStripsFromTop(e);
         ScratchJr.unfocus(e);
         ScratchJr.saveProject(e, ScratchJr.flippage);
-        iOS.analyticsEvent('editor', 'project_editor_close');
+        window[OS].analyticsEvent('editor', 'project_editor_close');
     }
 
     static flippage () {
         Alert.close();
-        iOS.cleanassets('wav', doNext);
+        window[OS].cleanassets('wav', doNext);
         function doNext () {
-            iOS.cleanassets('svg', ScratchJr.switchPage);
+            window[OS].cleanassets('svg', ScratchJr.switchPage);
         }
     }
 
@@ -525,7 +524,7 @@ export default class ScratchJr {
         ScratchJr.displayStatus('none');
         inFullscreen = true;
         UI.enterFullScreen();
-        iOS.analyticsEvent('editor', 'full_screen_entered');
+        window[OS].analyticsEvent('editor', 'full_screen_entered');
         document.body.style.background = 'black';
     }
 
@@ -537,7 +536,7 @@ export default class ScratchJr {
         inFullscreen = false;
         UI.quitFullScreen();
         onBackButtonCallback.pop();
-        iOS.analyticsEvent('editor', 'full_screen_exited');
+        window[OS].analyticsEvent('editor', 'full_screen_exited');
         document.body.style.background = 'white';
     }
 
@@ -906,24 +905,24 @@ export default class ScratchJr {
     //Application on the background
 
 
-    // XXX: does this ever happen?
-    // I'm pretty sure this is dead code -TM
-    static saveProjectState () {
-        ScratchAudio.sndFX('tap.wav');
-        if (frame.style.display == 'none') {
-            Paint.saveEditState(ScratchJr.stopServer);
-        } else {
-            ScratchJr.unfocus();
-            ScratchJr.stopStrips();
-            if (ScratchJr.isEditable() && currentProject && !Project.error && changed) {
-                Project.save(currentProject, ScratchJr.stopServer);
-            }
-        }
-    }
-
-    static stopServer () {
-        iOS.stopserver(iOS.trace);
-    }
+    // // XXX: does this ever happen?
+    // // I'm pretty sure this is dead code -TM
+    // static saveProjectState () {
+    //     ScratchAudio.sndFX('tap.wav');
+    //     if (frame.style.display == 'none') {
+    //         Paint.saveEditState(ScratchJr.stopServer);
+    //     } else {
+    //         ScratchJr.unfocus();
+    //         ScratchJr.stopStrips();
+    //         if (ScratchJr.isEditable() && currentProject && !Project.error && changed) {
+    //             Project.save(currentProject, ScratchJr.stopServer);
+    //         }
+    //     }
+    // }
+    //
+    // static stopServer () {
+    //     window[OS].stopserver(window[OS].trace);
+    // }
 
     /**
      * The functions that are invokved when the Android back button is clicked.
